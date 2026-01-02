@@ -5,6 +5,7 @@ from ..models import Post, PostPublic, PostBase, PostCreate, PostUpdate, User
 from ..oauth2 import get_current_user
 from ..database import SessionDep
 from sqlmodel import Session, select
+from sqlalchemy.orm import selectinload
 
 router = APIRouter(prefix="/posts", tags=["Post"])
 
@@ -31,12 +32,14 @@ def read_posts(
     current_user: Annotated[User, Depends(get_current_user)],
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 3,
+    search: Optional[str] = "",
     show_all: Optional[bool] = True
 ):
 
-    select_stmt = select(Post)
+    # select_stmt = select(Post)
+    select_stmt = (select(Post).options(selectinload(Post.owner))) # With `selectinload`, there will be 2 separate queries. One for `post` and another for `user`. 
     select_stmt = select_stmt if show_all else select_stmt.where(Post.owner_id == current_user.id)
-    posts = session.exec(select_stmt.offset(offset).limit(limit)).all()
+    posts = session.exec(select_stmt.where(Post.content.ilike(f"%{search}%")).offset(offset).limit(limit)).all()
     
     if not posts:
         raise HTTPException(
