@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
-from sqlalchemy import Column, String, Boolean, DateTime, text
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, text, ForeignKey
 from typing import Optional
 
 # class Post(SQLModel, table=True):
@@ -50,11 +50,13 @@ class Post(PostBase, table=True):
             nullable=False,
             server_default=text("timezone('utc', now())"),   # PostgreSQL UTC now()
         ),
-    ) 
+    )
+    owner_id: int = Field(sa_column = Column(Integer, ForeignKey("user.id", ondelete = "CASCADE"), nullable = False)) 
 
 # SQLModel defining the output schema for GET API
 class PostPublic(PostBase):
     id: int
+    owner_id: int
 
 # SQLModel defining the input schema for CREATE API
 class PostCreate(PostBase):
