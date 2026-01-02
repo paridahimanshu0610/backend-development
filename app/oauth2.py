@@ -16,7 +16,10 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login") # Here, `tokenUrl="login"` tells Swagger where to get a token. It does nothing at runtime. It can even be a fake URL 
+# In OAuth2PasswordBearer, `tokenUrl="login"` tells SwaggerUI where to get a token. It does nothing at runtime. It can even be a fake URL
+# token='login' is just for front-end documentation purpose.
+# `OAuth2PasswordBearer` reads the Authorization header in the HTTPRequest
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def prepare_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -30,7 +33,7 @@ def prepare_access_token(data: dict, expires_delta: timedelta | None = None):
 
 # HTTP Request
 #     ↓
-# Authorization: Bearer <JWT>
+# Authorization Header: Bearer <JWT>
 #     ↓
 # OAuth2PasswordBearer
 #     ↓
@@ -48,11 +51,11 @@ def verify_access_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
-
+        username = payload.get("username")
         if user_id is None:
             raise credentials_exception
         
-        token_data = TokenData(user_id=user_id)
+        token_data = TokenData(user_id=user_id, username = username)
 
     except InvalidTokenError:
         raise credentials_exception 

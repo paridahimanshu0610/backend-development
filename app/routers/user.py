@@ -60,11 +60,13 @@ def update_user(user_id:int, user: UpdateUser, session:SessionDep):
 
 @router.get("/", response_model=list[ReadUser], status_code=status.HTTP_200_OK)
 def read_user(
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)], # Annotated[User, Depends(get_current_user)] ensures that this API requires an authentication token. 
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ):
+    # `current_user` details will be used to check for things like resource permission, and use other user details required during backend processing.
+    print("current_user_details: ", current_user)
     users = session.exec(select(User).offset(offset).limit(limit)).all()
     return users
 
