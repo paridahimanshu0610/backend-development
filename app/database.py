@@ -2,8 +2,9 @@ from sqlmodel import SQLModel, create_engine, Session
 from .models import *
 from typing import Annotated
 from fastapi import Depends
+from .config import settings
 
-database_url = "postgresql://postgres:test@localhost:5432/fastapi" # "dialect+driver://username:password@host:port/database"
+database_url = f"{settings.database}://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}" # "dialect+driver://username:password@host:port/database"
 
 engine = create_engine(database_url, echo=True)
 

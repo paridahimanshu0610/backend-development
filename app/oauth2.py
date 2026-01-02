@@ -8,13 +8,14 @@ from pwdlib import PasswordHash
 from pydantic import BaseModel
 from .models import User, TokenData, Token
 from .database import SessionDep
+from .config import settings
 from sqlmodel import select
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 # In OAuth2PasswordBearer, `tokenUrl="login"` tells SwaggerUI where to get a token. It does nothing at runtime. It can even be a fake URL
 # token='login' is just for front-end documentation purpose.
