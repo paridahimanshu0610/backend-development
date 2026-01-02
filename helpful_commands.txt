@@ -1,0 +1,7 @@
+pip freeze //shows you a list of all Python packages installed in your current environment, along with their exact versions
+pip freeze > requirements.txt //save your environment dependencies into a file
+pip install -r requirements.txt //Later, someone else (or you, on another machine) can recreate the exact same environment with this command
+fastapi dev app\main.py //For development (automatic reload on saving the main.py file)
+fastapi run //For production (no reload, CLI handles discovery. Looks for app = FastAPI() in the main.py file)
+uvicorn main:app //Directly running with Uvicorn (here, we have the freedom to specify the FastAPI object (e.g. app) and the entrypoint file's name (e.g. main.py))
+uvicorn app.main:app //Running with uvicorn when main file is inside app folder
