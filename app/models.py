@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, text, ForeignKey
-from typing import Optional
+from typing import Optional, Literal
 
 ########################################### USER MODEL ###########################################
 class BaseUser(SQLModel):
@@ -105,6 +105,12 @@ class PostPublic(PostBase):
     owner_id: int
     owner: ReadUser
 
+class PostWithVote(BaseModel):
+    post: PostPublic  # This can remain SQLModel-derived
+    votes: int
+    class Config:
+        orm_mode = True  # Important! Allows FastAPI to serialize SQLModel objects
+
 # SQLModel defining the input schema for CREATE API
 class PostCreate(PostBase):
     pass
@@ -125,3 +131,12 @@ class Token(SQLModel):
 class TokenData(SQLModel):
     username: Optional[str] = None
     user_id: Optional[int] = None
+
+########################################### VOTES MODEL ###########################################
+class Vote(SQLModel, table=True):
+    user_id: int = Field(sa_column = Column(Integer, ForeignKey("user.id", ondelete = "CASCADE"), primary_key=True))
+    post_id: int = Field(sa_column = Column(Integer, ForeignKey("post.id", ondelete = "CASCADE"), primary_key=True))
+
+class VoteApiSchema(BaseModel):
+    post_id: int
+    vote_dir: Literal[0, 1] # Like:1 | Unlike:0
