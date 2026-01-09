@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from pydantic import EmailStr, BaseModel
+from pydantic import EmailStr, BaseModel, ConfigDict
 from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, text, ForeignKey
 from typing import Optional, Literal
@@ -13,6 +13,7 @@ class BaseUser(SQLModel):
 class User(BaseUser, table=True):
     id: int | None = Field(default=None, primary_key=True, index=True)
     password: str = Field(nullable=False)
+    phone_number: str = Field(default=None)
     hashed_password: str = Field(nullable=False)
     # Using server-side default for date_created to ensure consistency across distributed systems and avoid timezone issues.
     date_created: datetime = Field(
@@ -108,8 +109,10 @@ class PostPublic(PostBase):
 class PostWithVote(BaseModel):
     post: PostPublic  # This can remain SQLModel-derived
     votes: int
-    class Config:
-        orm_mode = True  # Important! Allows FastAPI to serialize SQLModel objects
+
+    model_config = ConfigDict(from_attributes=True)
+    # class Config:
+    #     orm_mode = True  # Important! Allows FastAPI to serialize SQLModel objects
 
 # SQLModel defining the input schema for CREATE API
 class PostCreate(PostBase):
