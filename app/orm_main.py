@@ -6,13 +6,14 @@ from .database import create_db_and_tables, SessionDep
 from .models import *
 from .routers import post, user, auth, vote
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Starting up...")
-    create_db_and_tables()
-    yield
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     print("Starting up...")
+#     create_db_and_tables()
+#     yield
 
-app = FastAPI(lifespan = lifespan)
+# app = FastAPI(lifespan = lifespan)
+app = FastAPI() # create_db_and_tables() is no longer needed as we upgrade the database using Alembic
 
 app.include_router(post.router)
 app.include_router(user.router)
