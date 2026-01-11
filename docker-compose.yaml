@@ -1,0 +1,31 @@
+name: myfastapiapp
+
+services:
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/usr/src/app:ro # ro -> read-only. `ro` ensures that container cannot modify any of the project files
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_HOSTNAME: fastapidb   # override the hostname only
+    depends_on:
+      - fastapidb
+    restart: unless-stopped
+
+  fastapidb:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
