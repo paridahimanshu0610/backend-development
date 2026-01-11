@@ -13,7 +13,7 @@ class BaseUser(SQLModel):
 class User(BaseUser, table=True):
     id: int | None = Field(default=None, primary_key=True, index=True)
     password: str = Field(nullable=False)
-    phone_number: str = Field(default=None)
+    phone_number: str = Field(default=None, nullable=True)
     hashed_password: str = Field(nullable=False)
     # Using server-side default for date_created to ensure consistency across distributed systems and avoid timezone issues.
     date_created: datetime = Field(
