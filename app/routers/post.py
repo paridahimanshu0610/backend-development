@@ -118,13 +118,20 @@ def read_post(post_id: int, session: SessionDep, current_user: Annotated[User, D
 
 
 @router.patch("/{post_id}", response_model=PostPublic)
-def update_post(post_id: int, post: PostUpdate, session: SessionDep):
+def update_post(post_id: int, post: PostUpdate, session: SessionDep, current_user: Annotated[User, Depends(get_current_user)],):
     post_db = session.get(Post, post_id)
     if not post_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail= f"Post with id: {post_id} was not found."
         )
+
+    if post_db.owner_id!=current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail= "You are not allowed to delete this post."
+        )
+
     post_data = post.model_dump(exclude_unset=True)
     post_db.sqlmodel_update(post_data)
     session.add(post_db)
