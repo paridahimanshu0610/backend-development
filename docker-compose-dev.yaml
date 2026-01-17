@@ -9,8 +9,8 @@ services:
       - ./:/usr/src/app:ro # ro -> read-only. `ro` ensures that container cannot modify any of the project files
     env_file:
       - ./.env
-    environment:
-      DATABASE_HOSTNAME: fastapidb   # override the hostname only
+    # environment:
+    #   DATABASE_HOSTNAME: fastapidb   # override the hostname only
     depends_on:
       - fastapidb
     restart: unless-stopped
